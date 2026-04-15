@@ -178,10 +178,6 @@ export default function App() {
             visible={adVisible}
             adType={adType}
             onClose={() => setAdVisible(false)}
-            onRemoveAds={() => {
-              setAdVisible(false);
-              ad.purchasePremium('monthly');
-            }}
           />
           <StatusBar style="light" />
         </ErrorBoundary>
@@ -211,10 +207,6 @@ export default function App() {
             visible={adVisible}
             adType={adType}
             onClose={() => setAdVisible(false)}
-            onRemoveAds={() => {
-              setAdVisible(false);
-              ad.purchasePremium('monthly');
-            }}
           />
           <StatusBar style="light" />
         </ErrorBoundary>
@@ -282,15 +274,6 @@ export default function App() {
               <GuideScreen
                 onPdfPress={handleExportPdf}
                 pdfLoading={pdfLoading}
-                isPremium={ad.isPremium}
-                onCancelSubscription={async () => {
-                  await ad.resetAds();
-                  Alert.alert('解約完了', '無料プランに戻りました。');
-                }}
-                onPurchasePremium={async (period) => {
-                  await ad.purchasePremium(period);
-                  Alert.alert('購入完了', '広告が非表示になりました。');
-                }}
               />
             )}
           </SwipeWrapper>
@@ -323,10 +306,6 @@ export default function App() {
           visible={adVisible}
           adType={adType}
           onClose={() => setAdVisible(false)}
-          onRemoveAds={() => {
-            setAdVisible(false);
-            ad.purchasePremium('monthly');
-          }}
         />
 
         <StatusBar style="light" />

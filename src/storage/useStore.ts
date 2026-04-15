@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Asset, AppData, AssetCategoryId } from '../types';
+import { loadDemoData } from '../utils/demoData'; // DEMO-REVERT: スクショ撮影後に削除
 
 const STORAGE_KEY = 'souzoku_app_data';
 
@@ -23,6 +24,7 @@ export function useStore() {
   useEffect(() => {
     (async () => {
       try {
+        await loadDemoData(); // DEMO-REVERT: スクショ撮影後に削除
         const raw = await AsyncStorage.getItem(STORAGE_KEY);
         if (raw) {
           const parsed = JSON.parse(raw);

@@ -17,7 +17,6 @@ interface Props {
   visible: boolean;
   adType: AdType;
   onClose: () => void;
-  onRemoveAds: () => void;
 }
 
 /**
@@ -26,7 +25,7 @@ interface Props {
  * AdMob SDK 利用可能 → ネイティブ広告を表示し、閉じたら自動でモーダルも閉じる
  * SDK 不可（Expo Go等） → プレースホルダーUI + カウントダウン後に閉じるボタン
  */
-export function AdModal({ visible, adType, onClose, onRemoveAds }: Props) {
+export function AdModal({ visible, adType, onClose }: Props) {
   const [canClose, setCanClose] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const [showFallback, setShowFallback] = useState(false);
@@ -121,10 +120,6 @@ export function AdModal({ visible, adType, onClose, onRemoveAds }: Props) {
                 <Text style={styles.countdownText}>{countdown}秒後に閉じられます</Text>
               </View>
             )}
-
-            <TouchableOpacity style={styles.removeAdsBtn} onPress={onRemoveAds}>
-              <Text style={styles.removeAdsBtnText}>¥110/月で広告を非表示にする →</Text>
-            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -193,14 +188,5 @@ const styles = StyleSheet.create({
   countdownText: {
     fontSize: 12,
     color: COLORS.textMuted,
-  },
-  removeAdsBtn: {
-    alignItems: 'center',
-    paddingVertical: 4,
-  },
-  removeAdsBtnText: {
-    fontSize: 11,
-    color: COLORS.accent,
-    fontWeight: '600',
   },
 });

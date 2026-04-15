@@ -1,31 +1,6 @@
 /**
- * 想続フォリオ プラン・広告設定
+ * 想いフォリオ 広告設定
  */
-
-export interface PlanDefinition {
-  id: string;
-  name: string;
-  adFree: boolean;
-}
-
-export const PLANS: Record<string, PlanDefinition> = {
-  free: {
-    id: 'free',
-    name: '無料プラン',
-    adFree: false,
-  },
-  premium: {
-    id: 'premium',
-    name: 'プレミアム（広告なし）',
-    adFree: true,
-  },
-};
-
-/** 価格表示用 */
-export const PRICING = {
-  monthly: { label: '月額', price: 110, display: '¥110/月' },
-  yearly: { label: '年額（一括）', price: 980, display: '¥980/年', savings: '26%お得' },
-} as const;
 
 /**
  * 広告表示ルール

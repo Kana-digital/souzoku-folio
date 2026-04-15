@@ -5,9 +5,6 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  Alert,
-  Linking,
-  Platform,
   Modal,
 } from 'react-native';
 import { COLORS } from '../constants/colors';
@@ -22,22 +19,21 @@ const LEGAL_CONTENT = {
     title: 'プライバシーポリシー',
     updated: '最終更新日: 2026年4月14日',
     sections: [
-      { title: '', body: '想続フォリオ（以下「本アプリ」）は、大切な方への備忘録として、ご自身で情報を整理・記録するためのアプリです。本ポリシーは、本アプリにおけるデータの取り扱いについて説明します。' },
-      { title: '1. 本アプリが扱うデータと保存場所', body: '本アプリに入力された情報（名称、カテゴリ、金額、メモ等）は、お使いの端末内にのみ保存されます。外部のサーバーに送信されることはありません。インターネット接続がなくてもお使いいただけます。\n\nアカウント登録は不要です。生体認証（Face ID / Touch ID 等）による画面ロックは、すべて端末上で処理されます。\n\n無料プランではGoogle AdMobによる広告が表示されます。パーソナライズ広告は無効にしており、追跡型の広告は配信されません。\n\nプレミアムプラン（広告非表示）の購入はApple App Store / Google Play Storeを通じて処理されます。決済情報が運営者に届くことはありません。' },
-      { title: '2. プレミアムプランについて', body: 'プレミアムプラン（¥110/月 または ¥980/年）に加入すると広告が非表示になり、広告関連のデータ送信も停止します。' },
-      { title: '3. 外部サービスとの連携', body: '本アプリはRevenueCat（課金状態の管理）およびGoogle AdMob（無料プランの広告表示）を利用しています。いずれも機能提供に必要な範囲でのみ利用しており、入力されたデータを販売・共有することはありません。' },
-      { title: '4. データの削除', body: 'アプリを削除（アンインストール）すると、端末内のデータは消去されます。' },
-      { title: '5. ポリシーの変更', body: '本ポリシーは予告なく変更する場合があります。' },
+      { title: '', body: '想いフォリオ（以下「本アプリ」）は、ご自身の資産情報をノート感覚で整理・記録するためのアプリです。本ポリシーは、本アプリにおけるデータの取り扱いについて説明します。' },
+      { title: '1. 本アプリが扱うデータと保存場所', body: '本アプリに入力された情報（名称、カテゴリ、金額、メモ等）は、お使いの端末内にのみ保存されます。外部のサーバーに送信されることはありません。インターネット接続がなくてもお使いいただけます。\n\nアカウント登録は不要です。生体認証（Face ID / Touch ID 等）による画面ロックは、すべて端末上で処理されます。\n\n本アプリではGoogle AdMobによる広告が表示されます。パーソナライズ広告は無効にしており、追跡型の広告は配信されません。' },
+      { title: '2. 外部サービスとの連携', body: '本アプリはGoogle AdMob（広告表示）を利用しています。機能提供に必要な範囲でのみ利用しており、入力された資産データを販売・共有することはありません。' },
+      { title: '3. データの削除', body: 'アプリを削除（アンインストール）すると、端末内のデータは消去されます。' },
+      { title: '4. ポリシーの変更', body: '本ポリシーは予告なく変更する場合があります。' },
     ],
   },
   terms: {
     title: '利用規約',
     updated: '最終更新日: 2026年4月14日',
     sections: [
-      { title: '', body: '本利用規約は、想続フォリオ（以下「本アプリ」）のご利用条件を定めるものです。' },
-      { title: '1. 本アプリについて', body: '本アプリは、大切な方への備忘録として、ご自身で情報を整理・記録するためのツールです。法律・税務・財務に関する専門的な助言を提供するものではありません。具体的な手続や判断については、必ず司法書士・税理士・弁護士等の専門家にご相談ください。' },
+      { title: '', body: '本利用規約は、想いフォリオ（以下「本アプリ」）のご利用条件を定めるものです。' },
+      { title: '1. 本アプリについて', body: '本アプリは、ご自身の資産情報を整理・記録するためのツールです。法律・税務・財務に関する専門的な助言を提供するものではありません。具体的な手続や判断については、必ず司法書士・税理士・弁護士等の専門家にご相談ください。' },
       { title: 'ご注意', body: '本アプリに表示される手続ガイド等の情報は、一般的な参考情報です。これらの情報に基づいて行った行為について、運営者は責任を負いかねます。' },
-      { title: '2. 料金', body: '【無料プラン】基本機能はすべて無料でお使いいただけます。広告が表示されます。\n\n【プレミアムプラン】月額¥110 または 年額¥980 で広告が非表示になります。\n\nサブスクリプションは期間終了の24時間前までに解約されない場合、自動的に更新されます。解約はアプリ内またはApp Store / Google Playの設定から行えます。' },
+      { title: '2. 料金', body: '本アプリは無料でお使いいただけます。広告が表示されます。' },
       { title: '3. データについて', body: '入力されたデータの正確性や管理はご自身の責任でお願いいたします。端末の故障・紛失等によるデータの消失について、運営者の故意または重大な過失がある場合を除き、責任を負いかねます。' },
       { title: '4. 禁止事項', body: '本アプリの逆コンパイル・リバースエンジニアリング、不正アクセス、本アプリを利用した違法行為はお控えください。' },
       { title: '5. サービスの変更・終了', body: '運営者は本アプリの内容を変更、または提供を終了する場合があります。' },
@@ -49,12 +45,9 @@ const LEGAL_CONTENT = {
 interface Props {
   onPdfPress?: () => void;
   pdfLoading?: boolean;
-  isPremium?: boolean;
-  onCancelSubscription?: () => void;
-  onPurchasePremium?: (period: 'monthly' | 'yearly') => void;
 }
 
-export function GuideScreen({ onPdfPress, pdfLoading, isPremium, onCancelSubscription, onPurchasePremium }: Props) {
+export function GuideScreen({ onPdfPress, pdfLoading }: Props) {
   const [selectedGuide, setSelectedGuide] = useState<CategoryGuide | null>(null);
   const [legalPage, setLegalPage] = useState<LegalPage>(null);
 
@@ -157,78 +150,6 @@ export function GuideScreen({ onPdfPress, pdfLoading, isPremium, onCancelSubscri
             </View>
           </TouchableOpacity>
         )}
-
-        {/* プラン・解約セクション */}
-        <View style={styles.planSection}>
-          <Text style={styles.planSectionTitle}>プラン</Text>
-          <TouchableOpacity
-            style={styles.planCard}
-            activeOpacity={isPremium ? 1 : 0.7}
-            onPress={() => {
-              if (isPremium) return;
-              Alert.alert(
-                'プレミアムプラン',
-                '広告を非表示にできます。',
-                [
-                  { text: 'キャンセル', style: 'cancel' },
-                  {
-                    text: '月額 ¥110',
-                    onPress: () => onPurchasePremium?.('monthly'),
-                  },
-                  {
-                    text: '年額 ¥980（お得）',
-                    onPress: () => onPurchasePremium?.('yearly'),
-                  },
-                ],
-              );
-            }}
-            testID="plan-card"
-          >
-            <View style={styles.planRow}>
-              <Text style={styles.planLabel}>現在のプラン</Text>
-              <Text style={[styles.planValue, isPremium && styles.planValuePremium]}>
-                {isPremium ? 'プレミアム（広告なし）' : '無料プラン'}
-              </Text>
-            </View>
-            {!isPremium && (
-              <Text style={styles.planUpgradeHint}>タップしてプレミアムに変更</Text>
-            )}
-          </TouchableOpacity>
-          {isPremium && (
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={() => {
-                Alert.alert(
-                  'プレミアムプランの解約',
-                  Platform.OS === 'ios'
-                    ? 'App Storeのサブスクリプション管理画面で解約できます。解約後も期間終了まで広告なしでご利用いただけます。\n\nApp Storeの設定を開きますか？'
-                    : 'Google Playのサブスクリプション管理画面で解約できます。解約後も期間終了まで広告なしでご利用いただけます。\n\nGoogle Playの設定を開きますか？',
-                  [
-                    { text: 'キャンセル', style: 'cancel' },
-                    {
-                      text: '設定を開く',
-                      onPress: () => {
-                        if (Platform.OS === 'ios') {
-                          Linking.openURL('https://apps.apple.com/account/subscriptions');
-                        } else {
-                          Linking.openURL('https://play.google.com/store/account/subscriptions');
-                        }
-                      },
-                    },
-                    ...(onCancelSubscription ? [{
-                      text: 'アプリ内で解約',
-                      style: 'destructive' as const,
-                      onPress: onCancelSubscription,
-                    }] : []),
-                  ],
-                );
-              }}
-              testID="cancel-subscription"
-            >
-              <Text style={styles.cancelButtonText}>プレミアムプランを解約</Text>
-            </TouchableOpacity>
-          )}
-        </View>
 
         {/* プラポリ・利用規約 */}
         <View style={styles.legalSection}>
@@ -443,59 +364,6 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     fontSize: 12,
     marginTop: 2,
-  },
-  // プランセクション
-  planSection: {
-    marginTop: 32,
-  },
-  planSectionTitle: {
-    color: COLORS.textSecondary,
-    fontSize: 14,
-    fontWeight: '600',
-    marginBottom: 8,
-  },
-  planCard: {
-    backgroundColor: COLORS.card,
-    borderRadius: 12,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: COLORS.cardBorder,
-  },
-  planRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  planLabel: {
-    color: COLORS.textSecondary,
-    fontSize: 14,
-  },
-  planValue: {
-    color: COLORS.textPrimary,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  planValuePremium: {
-    color: COLORS.accent,
-  },
-  planUpgradeHint: {
-    color: COLORS.accent,
-    fontSize: 12,
-    marginTop: 8,
-    textAlign: 'center',
-  },
-  cancelButton: {
-    marginTop: 12,
-    paddingVertical: 12,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: COLORS.error + '60',
-    alignItems: 'center',
-  },
-  cancelButtonText: {
-    color: COLORS.error,
-    fontSize: 14,
-    fontWeight: '600',
   },
   // プラポリ・利用規約
   legalSection: {
