@@ -7,9 +7,11 @@
  */
 
 import { Platform } from 'react-native';
-import Constants from 'expo-constants';
 
-const isExpoGo = Constants.appOwnership === 'expo';
+// Expo Go 判定: react-native-google-mobile-ads の require で失敗した場合の
+// フォールバックで判定するため、ここでは固定で false にしておく。
+// Expo Go であれば下の require が失敗して自動的にプレースホルダーモードになる。
+const isExpoGo = false;
 
 // 広告ユニットID
 const AD_UNIT_IDS = {

@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Asset, AppData, AssetCategoryId } from '../types';
-import { loadDemoData } from '../utils/demoData'; // DEMO-REVERT: スクショ撮影後に削除
 
 const STORAGE_KEY = 'souzoku_app_data';
 
@@ -15,6 +14,11 @@ const DEFAULT_DATA: AppData = {
  * AsyncStorage 永続化フック
  * アプリ起動時に自動でデータを読み込み、
  * 変更時に自動で保存する。
+ *
+ * 起動時マイグレーション:
+ *   v1.0.0 でスクショ撮影用の demo data (id: `demo_...`) が混入していたため、
+ *   初回起動時にそれらを除去する。ユーザーが追加した資産は `asset_...` prefix
+ *   なので影響を受けない。
  */
 export function useStore() {
   const [data, setData] = useState<AppData>(DEFAULT_DATA);
@@ -24,17 +28,28 @@ export function useStore() {
   useEffect(() => {
     (async () => {
       try {
-        await loadDemoData(); // DEMO-REVERT: スクショ撮影後に削除
         const raw = await AsyncStorage.getItem(STORAGE_KEY);
         if (raw) {
           const parsed = JSON.parse(raw);
           // バリデーション: assets が配列かどうか
           if (parsed && Array.isArray(parsed.assets)) {
-            setData({
-              assets: parsed.assets,
+            // マイグレーション: demo_ prefix の asset を除去
+            const cleanedAssets = parsed.assets.filter(
+              (a: Asset) => !a?.id?.startsWith('demo_')
+            );
+            const migrated = cleanedAssets.length !== parsed.assets.length;
+
+            const nextData: AppData = {
+              assets: cleanedAssets,
               isAuthEnabled: parsed.isAuthEnabled ?? true,
               categoryColors: parsed.categoryColors ?? {},
-            });
+            };
+            setData(nextData);
+
+            // クリーニングされた場合は永続化しておく
+            if (migrated) {
+              await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(nextData));
+            }
           }
         }
       } catch (e) {
