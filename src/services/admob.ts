@@ -1,5 +1,5 @@
 /**
- * AdMob 広告サービス（想続フォリオ版）
+ * AdMob 広告サービス（想いフォリオ版）
  *
  * react-native-google-mobile-ads を使用。
  * Expo Go ではネイティブSDKが利用できないため、

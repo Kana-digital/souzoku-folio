@@ -2,7 +2,7 @@
   "expo": {
     "name": "想いフォリオ",
     "slug": "souzoku-folio",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -28,7 +28,7 @@
       "bundleIdentifier": "com.kanadigital.souzokufolio",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "NSFaceIDUsageDescription": "想続フォリオを安全にロック解除するために使用します",
+        "NSFaceIDUsageDescription": "想いフォリオを安全にロック解除するために使用します",
         "SKAdNetworkItems": [
           {
             "SKAdNetworkIdentifier": "cstr6suwn9.skadnetwork"

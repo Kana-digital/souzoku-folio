@@ -1,7 +1,7 @@
 {
   "name": "souzoku-folio",
   "version": "1.0.0",
-  "description": "想続フォリオ - 相続人向け財産管理アプリ",
+  "description": "想いフォリオ - 相続人向け財産管理アプリ",
   "main": "expo/AppEntry",
   "scripts": {
     "start": "expo start",

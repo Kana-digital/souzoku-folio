@@ -13,6 +13,7 @@ import * as LocalAuthentication from 'expo-local-authentication';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 import { SwipeWrapper } from './src/components/SwipeWrapper';
 import { AdModal } from './src/components/AdModal';
+import { PaywallModal } from './src/components/PaywallModal';
 import { HomeScreen } from './src/screens/HomeScreen';
 import { ListScreen } from './src/screens/ListScreen';
 import { AnalysisScreen } from './src/screens/AnalysisScreen';
@@ -20,7 +21,7 @@ import { GuideScreen } from './src/screens/GuideScreen';
 import { AddAssetScreen } from './src/screens/AddAssetScreen';
 import { AssetDetailScreen } from './src/screens/AssetDetailScreen';
 import { useStore } from './src/storage/useStore';
-import { useAdManager } from './src/hooks/useAdManager';
+import { useSubscription } from './src/hooks/useSubscription';
 import { initAdMob } from './src/services/admob';
 import { exportPdf } from './src/services/pdfExport';
 import { Asset, AssetCategoryId } from './src/types';
@@ -32,7 +33,7 @@ type Modal = null | 'add' | { type: 'detail'; asset: Asset };
 
 export default function App() {
   const store = useStore();
-  const ad = useAdManager();
+  const { isPremium, purchase, restore, recordAction } = useSubscription();
   const [tabIndex, setTabIndex] = useState(0);
   const [modal, setModal] = useState<Modal>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -42,13 +43,17 @@ export default function App() {
   // 広告モーダル
   const [adVisible, setAdVisible] = useState(false);
   const [adType, setAdType] = useState<'image' | 'video'>('image');
+  // ペイウォールモーダル
+  const [paywallVisible, setPaywallVisible] = useState(false);
 
   const tab = TABS[tabIndex];
 
-  // AdMob初期化
+  // AdMob初期化（プレミアムユーザーはスキップ）
   useEffect(() => {
-    initAdMob();
-  }, []);
+    if (!isPremium) {
+      initAdMob();
+    }
+  }, [isPremium]);
 
   // タブスワイプ — 端では動かない
   const canSwipeLeft = tabIndex < TABS.length - 1;
@@ -62,12 +67,12 @@ export default function App() {
 
   // 広告表示
   const showAdIfNeeded = useCallback(async () => {
-    const type = await ad.recordAction();
+    const type = await recordAction();
     if (type) {
       setAdType(type);
       setAdVisible(true);
     }
-  }, [ad]);
+  }, [recordAction]);
 
   // 資産追加（広告付き）
   const handleAddAsset = useCallback(async (data: Omit<Asset, 'id' | 'createdAt' | 'updatedAt'>) => {
@@ -99,7 +104,7 @@ export default function App() {
         return;
       }
       const result = await LocalAuthentication.authenticateAsync({
-        promptMessage: '想続フォリオを開く',
+        promptMessage: '想いフォリオを開く',
         cancelLabel: 'キャンセル',
         disableDeviceFallback: false,
       });
@@ -139,7 +144,7 @@ export default function App() {
   if (!isAuthenticated) {
     const retryAuth = async () => {
       const result = await LocalAuthentication.authenticateAsync({
-        promptMessage: '想続フォリオを開く',
+        promptMessage: '想いフォリオを開く',
         cancelLabel: 'キャンセル',
         disableDeviceFallback: false,
       });
@@ -148,7 +153,7 @@ export default function App() {
     return (
       <View style={styles.lockContainer}>
         <Text style={styles.lockIcon}>🔒</Text>
-        <Text style={styles.lockTitle}>想続フォリオ</Text>
+        <Text style={styles.lockTitle}>想いフォリオ</Text>
         <Text style={styles.lockMessage}>認証が必要です</Text>
         <TouchableOpacity style={styles.lockButton} onPress={retryAuth} testID="auth-retry">
           <Text style={styles.lockButtonText}>認証する</Text>
@@ -178,6 +183,7 @@ export default function App() {
             visible={adVisible}
             adType={adType}
             onClose={() => setAdVisible(false)}
+            onRemoveAds={() => { setAdVisible(false); setPaywallVisible(true); }}
           />
           <StatusBar style="light" />
         </ErrorBoundary>
@@ -207,6 +213,7 @@ export default function App() {
             visible={adVisible}
             adType={adType}
             onClose={() => setAdVisible(false)}
+            onRemoveAds={() => { setAdVisible(false); setPaywallVisible(true); }}
           />
           <StatusBar style="light" />
         </ErrorBoundary>
@@ -274,6 +281,10 @@ export default function App() {
               <GuideScreen
                 onPdfPress={handleExportPdf}
                 pdfLoading={pdfLoading}
+                isAuthEnabled={store.isAuthEnabled}
+                onAuthToggle={store.setAuthEnabled}
+                isPremium={isPremium}
+                onUpgradePress={() => setPaywallVisible(true)}
               />
             )}
           </SwipeWrapper>
@@ -306,6 +317,15 @@ export default function App() {
           visible={adVisible}
           adType={adType}
           onClose={() => setAdVisible(false)}
+          onRemoveAds={() => { setAdVisible(false); setPaywallVisible(true); }}
+        />
+
+        {/* ペイウォールモーダル */}
+        <PaywallModal
+          visible={paywallVisible}
+          onClose={() => setPaywallVisible(false)}
+          onPurchase={purchase}
+          onRestore={restore}
         />
 
         <StatusBar style="light" />

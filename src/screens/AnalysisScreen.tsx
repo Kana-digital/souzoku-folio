@@ -170,7 +170,7 @@ export function AnalysisScreen({ totalAmount }: Props) {
         )}
 
         {/* シミュレーション結果 */}
-        {simulation && goalAmount > 0 && gap > 0 && (
+        {simulation && goalAmount > 0 && gap > 0 && simulation.annualSaving > 0 && (
           <View style={styles.resultCard}>
             <Text style={styles.resultTitle}>積立シミュレーション</Text>
 
@@ -200,6 +200,23 @@ export function AnalysisScreen({ totalAmount }: Props) {
             <Text style={styles.resultNote}>
               ※ 年利{rateText}%複利で{yearsText}年間運用した場合の概算です。
               税金・手数料は含まれていません。
+            </Text>
+          </View>
+        )}
+
+        {/* 運用だけで目標達成可能なケース */}
+        {simulation && goalAmount > 0 && gap > 0 && simulation.annualSaving <= 0 && (
+          <View style={[styles.resultCard, { borderColor: COLORS.success }]}>
+            <Text style={[styles.resultTitle, { color: COLORS.success }]}>
+              運用のみで目標達成可能
+            </Text>
+            <Text style={styles.resultNote}>
+              追加の積立は不要です。
+              現在の資産 {formatYen(totalAmount)} を年利{rateText}%で{yearsText}年運用すると、
+              {formatYen(Math.round(simulation.futureValue))} になり、
+              目標の {formatYen(goalAmount)} を上回る見込みです。
+              {'\n\n'}
+              ※ 運用益には税金・手数料は含まれていません。
             </Text>
           </View>
         )}

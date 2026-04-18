@@ -1,6 +1,30 @@
+import { PlanDefinition } from '../types';
+
 /**
- * 想いフォリオ 広告設定
+ * 想いフォリオ プラン定義
+ * 広告モデル: 全機能無料 / 有料会員は広告非表示
  */
+export const PLANS: Record<string, PlanDefinition> = {
+  free: {
+    id: 'free',
+    name: '無料プラン',
+    adFree: false,
+  },
+  premium: {
+    id: 'premium',
+    name: 'プレミアム（広告なし）',
+    adFree: true,
+  },
+};
+
+/** RevenueCat の Entitlement identifier */
+export const RC_ENTITLEMENT = 'Omoi Folio Pro';
+
+/** 価格表示用 */
+export const PRICING = {
+  monthly: { label: '月額', price: 100, display: '¥100/月' },
+  yearly: { label: '年額（一括）', price: 1000, display: '¥1,000/年', savings: '17%お得' },
+} as const;
 
 /**
  * 広告表示ルール

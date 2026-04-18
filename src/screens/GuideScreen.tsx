@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Modal,
+  Switch,
 } from 'react-native';
 import { COLORS } from '../constants/colors';
 import { CATEGORY_MAP } from '../constants/categories';
@@ -33,7 +34,7 @@ const LEGAL_CONTENT = {
       { title: '', body: '本利用規約は、想いフォリオ（以下「本アプリ」）のご利用条件を定めるものです。' },
       { title: '1. 本アプリについて', body: '本アプリは、ご自身の資産情報を整理・記録するためのツールです。法律・税務・財務に関する専門的な助言を提供するものではありません。具体的な手続や判断については、必ず司法書士・税理士・弁護士等の専門家にご相談ください。' },
       { title: 'ご注意', body: '本アプリに表示される手続ガイド等の情報は、一般的な参考情報です。これらの情報に基づいて行った行為について、運営者は責任を負いかねます。' },
-      { title: '2. 料金', body: '本アプリは無料でお使いいただけます。広告が表示されます。' },
+      { title: '2. 料金', body: '本アプリは無料でお使いいただけます。無料プランでは広告が表示されます。広告を非表示にするプレミアムプラン（月額 ¥100 または年額 ¥1,000）をアプリ内課金にてご購入いただけます。サブスクリプションはiTunesアカウント（iOS）またはGoogle Playアカウント（Android）に請求され、現在の期間終了の24時間前までにキャンセルしない限り自動更新されます。' },
       { title: '3. データについて', body: '入力されたデータの正確性や管理はご自身の責任でお願いいたします。端末の故障・紛失等によるデータの消失について、運営者の故意または重大な過失がある場合を除き、責任を負いかねます。' },
       { title: '4. 禁止事項', body: '本アプリの逆コンパイル・リバースエンジニアリング、不正アクセス、本アプリを利用した違法行為はお控えください。' },
       { title: '5. サービスの変更・終了', body: '運営者は本アプリの内容を変更、または提供を終了する場合があります。' },
@@ -45,9 +46,13 @@ const LEGAL_CONTENT = {
 interface Props {
   onPdfPress?: () => void;
   pdfLoading?: boolean;
+  isAuthEnabled: boolean;
+  onAuthToggle: (enabled: boolean) => void;
+  isPremium?: boolean;
+  onUpgradePress?: () => void;
 }
 
-export function GuideScreen({ onPdfPress, pdfLoading }: Props) {
+export function GuideScreen({ onPdfPress, pdfLoading, isAuthEnabled, onAuthToggle, isPremium, onUpgradePress }: Props) {
   const [selectedGuide, setSelectedGuide] = useState<CategoryGuide | null>(null);
   const [legalPage, setLegalPage] = useState<LegalPage>(null);
 
@@ -149,6 +154,46 @@ export function GuideScreen({ onPdfPress, pdfLoading }: Props) {
               <Text style={styles.pdfSub}>家族に渡す資料を作成</Text>
             </View>
           </TouchableOpacity>
+        )}
+
+        {/* 設定 */}
+        <Text style={[styles.sectionTitle, { marginTop: 24 }]}>設定</Text>
+        <View style={styles.settingCard}>
+          <View style={styles.settingInfo}>
+            <Text style={styles.settingLabel}>画面ロック（生体認証）</Text>
+            <Text style={styles.settingDesc}>
+              Face ID / Touch ID でアプリを保護します
+            </Text>
+          </View>
+          <Switch
+            value={isAuthEnabled}
+            onValueChange={onAuthToggle}
+            trackColor={{ false: COLORS.cardBorder, true: COLORS.accent + '80' }}
+            thumbColor={isAuthEnabled ? COLORS.accent : COLORS.textMuted}
+          />
+        </View>
+
+        {/* プレミアムプラン */}
+        {!isPremium && onUpgradePress && (
+          <TouchableOpacity style={styles.upgradeCard} onPress={onUpgradePress}>
+            <Text style={styles.upgradeIcon}>✦</Text>
+            <View style={styles.settingInfo}>
+              <Text style={styles.settingLabel}>プレミアムプラン</Text>
+              <Text style={styles.settingDesc}>
+                広告を非表示にして快適に使う
+              </Text>
+            </View>
+            <Text style={styles.upgradeArrow}>→</Text>
+          </TouchableOpacity>
+        )}
+        {isPremium && (
+          <View style={styles.premiumBadgeCard}>
+            <Text style={styles.upgradeIcon}>✦</Text>
+            <View style={styles.settingInfo}>
+              <Text style={[styles.settingLabel, { color: COLORS.accent }]}>プレミアム会員</Text>
+              <Text style={styles.settingDesc}>広告なしでご利用中</Text>
+            </View>
+          </View>
         )}
 
         {/* プラポリ・利用規約 */}
@@ -364,6 +409,60 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     fontSize: 12,
     marginTop: 2,
+  },
+  // 設定
+  settingCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.card,
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: COLORS.cardBorder,
+  },
+  settingInfo: {
+    flex: 1,
+    marginRight: 12,
+  },
+  settingLabel: {
+    color: COLORS.textPrimary,
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  settingDesc: {
+    color: COLORS.textMuted,
+    fontSize: 12,
+    marginTop: 2,
+  },
+  // プレミアム
+  upgradeCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.accent + '15',
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 10,
+    borderWidth: 1,
+    borderColor: COLORS.accent + '40',
+  },
+  premiumBadgeCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.accent + '10',
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 10,
+    borderWidth: 1,
+    borderColor: COLORS.accent + '30',
+  },
+  upgradeIcon: {
+    fontSize: 18,
+    color: COLORS.accent,
+    marginRight: 12,
+  },
+  upgradeArrow: {
+    fontSize: 16,
+    color: COLORS.accent,
   },
   // プラポリ・利用規約
   legalSection: {

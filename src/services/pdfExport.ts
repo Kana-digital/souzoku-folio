@@ -66,7 +66,7 @@ export async function exportPdf(assets: Asset[]): Promise<void> {
 
 <!-- 表紙 -->
 <div class="cover">
-  <h1>想続フォリオ</h1>
+  <h1>想いフォリオ</h1>
   <div class="subtitle">資産一覧</div>
   <div class="date">作成日: ${dateStr}</div>
   <div class="notice">
@@ -133,7 +133,7 @@ ${guide.steps.map((s) => `
 
 <!-- フッター -->
 <div class="footer">
-  本書類は「想続フォリオ」により ${dateStr} に作成されました。<br/>
+  本書類は「想いフォリオ」により ${dateStr} に作成されました。<br/>
   本アプリは情報提供を目的としており、法的助言・税務助言ではありません。<br/>
   個別の相続手続は司法書士・税理士・弁護士にご相談ください。
 </div>
@@ -150,7 +150,7 @@ ${guide.steps.map((s) => `
   // 共有シートを開く
   await Sharing.shareAsync(uri, {
     mimeType: 'application/pdf',
-    dialogTitle: '想続フォリオ — 資産一覧PDF',
+    dialogTitle: '想いフォリオ — 資産一覧PDF',
     UTI: 'com.adobe.pdf',
   });
 }

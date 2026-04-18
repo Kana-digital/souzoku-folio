@@ -35,3 +35,23 @@ export interface AssetFormValues {
   title: string;
   amount: string;  // テキスト入力なので string
 }
+
+// ── サブスクリプション関連 ──
+
+export type PlanId = 'free' | 'premium';
+
+export interface SubscriptionState {
+  planId: PlanId;
+  entitlementId: string | null;
+  expiresAt: string | null;
+}
+
+export interface AdState {
+  actionCount: number;
+}
+
+export interface PlanDefinition {
+  id: PlanId;
+  name: string;
+  adFree: boolean;
+}
