@@ -33,7 +33,7 @@ type Modal = null | 'add' | { type: 'detail'; asset: Asset };
 
 export default function App() {
   const store = useStore();
-  const { isPremium, purchase, restore, recordAction } = useSubscription();
+  const { isPremium, isLoaded: subLoaded, purchase, restore, recordAction } = useSubscription();
   const [tabIndex, setTabIndex] = useState(0);
   const [modal, setModal] = useState<Modal>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -48,12 +48,12 @@ export default function App() {
 
   const tab = TABS[tabIndex];
 
-  // AdMob初期化（プレミアムユーザーはスキップ）
+  // AdMob初期化（サブスク状態ロード完了後、無料ユーザーのみ）
   useEffect(() => {
-    if (!isPremium) {
+    if (subLoaded && !isPremium) {
       initAdMob();
     }
-  }, [isPremium]);
+  }, [subLoaded, isPremium]);
 
   // タブスワイプ — 端では動かない
   const canSwipeLeft = tabIndex < TABS.length - 1;

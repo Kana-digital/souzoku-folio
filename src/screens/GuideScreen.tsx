@@ -7,6 +7,8 @@ import {
   StyleSheet,
   Modal,
   Switch,
+  Linking,
+  Platform,
 } from 'react-native';
 import { COLORS } from '../constants/colors';
 import { CATEGORY_MAP } from '../constants/categories';
@@ -194,6 +196,19 @@ export function GuideScreen({ onPdfPress, pdfLoading, isAuthEnabled, onAuthToggl
               <Text style={styles.settingDesc}>広告なしでご利用中</Text>
             </View>
           </View>
+        )}
+        {isPremium && (
+          <TouchableOpacity
+            style={styles.manageSubBtn}
+            onPress={() => {
+              const url = Platform.OS === 'ios'
+                ? 'https://apps.apple.com/account/subscriptions'
+                : 'https://play.google.com/store/account/subscriptions';
+              Linking.openURL(url);
+            }}
+          >
+            <Text style={styles.manageSubText}>サブスクリプションを管理</Text>
+          </TouchableOpacity>
         )}
 
         {/* プラポリ・利用規約 */}
@@ -463,6 +478,16 @@ const styles = StyleSheet.create({
   upgradeArrow: {
     fontSize: 16,
     color: COLORS.accent,
+  },
+  manageSubBtn: {
+    alignItems: 'center',
+    paddingVertical: 10,
+    marginTop: 6,
+  },
+  manageSubText: {
+    color: COLORS.textMuted,
+    fontSize: 12,
+    textDecorationLine: 'underline',
   },
   // プラポリ・利用規約
   legalSection: {

@@ -50,7 +50,12 @@ export function useSubscription() {
         ]);
         if (rawSub) {
           const parsed: SubscriptionState = JSON.parse(rawSub);
-          if (parsed.expiresAt && new Date(parsed.expiresAt) < new Date()) {
+          // 開発用ローカル課金が残っている場合はリセット
+          if (parsed.entitlementId?.startsWith('local_')) {
+            console.warn('[Subscription] ローカル課金状態を検出 → リセット');
+            await AsyncStorage.setItem(SUB_KEY, JSON.stringify(DEFAULT_SUB));
+            setSub(DEFAULT_SUB);
+          } else if (parsed.expiresAt && new Date(parsed.expiresAt) < new Date()) {
             const expired = { ...DEFAULT_SUB };
             await AsyncStorage.setItem(SUB_KEY, JSON.stringify(expired));
             setSub(expired);
@@ -130,21 +135,9 @@ export function useSubscription() {
         }
       }
 
-      // SDK未導入時のローカルフォールバック（開発用）
-      const expiresAt = new Date();
-      if (period === 'monthly') {
-        expiresAt.setMonth(expiresAt.getMonth() + 1);
-      } else {
-        expiresAt.setFullYear(expiresAt.getFullYear() + 1);
-      }
-      const newSub: SubscriptionState = {
-        planId: 'premium',
-        entitlementId: `local_${period}`,
-        expiresAt: expiresAt.toISOString(),
-      };
-      setSub(newSub);
-      await AsyncStorage.setItem(SUB_KEY, JSON.stringify(newSub));
-      return true;
+      // SDK未導入時 → 購入不可（エラーとして返す）
+      console.warn('[Purchase] RevenueCat SDKが利用できないため購入できません');
+      return false;
     },
     [],
   );
