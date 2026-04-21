@@ -111,12 +111,22 @@ export function useSubscription() {
       if (isRCAvailable()) {
         try {
           const offering = await getOfferings();
-          if (!offering) return false;
-          const pkgId = period === 'monthly' ? '$rc_monthly' : '$rc_annual';
-          const pkg = offering.availablePackages.find(
-            (p: any) => p.packageType === pkgId || p.identifier === pkgId
-          ) ?? offering.availablePackages[0];
-          if (!pkg) return false;
+          if (!offering) {
+            console.error('[Purchase] Offeringが取得できません');
+            return false;
+          }
+          // 3段階フォールバックでパッケージを検索
+          const identifier = period === 'monthly' ? '$rc_monthly' : '$rc_annual';
+          const packageType = period === 'monthly' ? 'MONTHLY' : 'ANNUAL';
+          const pkg =
+            offering.availablePackages.find((p: any) => p.identifier === identifier) ??
+            offering.availablePackages.find((p: any) => p.packageType === packageType) ??
+            offering.availablePackages[0];
+          if (!pkg) {
+            console.error('[Purchase] 利用可能なパッケージがありません');
+            return false;
+          }
+          console.log(`[Purchase] パッケージ選択: ${pkg.identifier} (type: ${pkg.packageType})`);
           const success = await purchasePackage(pkg);
           if (success) {
             const rcStatus = await checkSubscription();

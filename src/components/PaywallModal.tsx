@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Linking,
   Alert,
+  Platform,
 } from 'react-native';
 import { COLORS } from '../constants/colors';
 import { PRICING } from '../constants/plans';
@@ -155,9 +156,15 @@ export const PaywallModal = ({
               <Text style={styles.restoreText}>購入を復元</Text>
             </TouchableOpacity>
             <Text style={styles.termsText}>
-              サブスクリプションはiTunesアカウントに請求されます。{'\n'}
-              現在の期間終了の24時間前までにキャンセルしない限り自動更新されます。{'\n'}
-              設定アプリ {'>'} Apple ID {'>'} サブスクリプションから管理・キャンセルできます。{'\n\n'}
+              • サブスクリプション名: 想いフォリオ Pro{'\n'}
+              • 月額プラン: ¥{PRICING.monthly.price}/月（1ヶ月ごとの自動更新）{'\n'}
+              • 年額プラン: ¥{PRICING.yearly.price}/年（1年ごとの自動更新）{'\n'}
+              • お支払いは購入確認時に{Platform.OS === 'ios' ? 'Apple ID' : 'Google Play'}アカウントに請求されます{'\n'}
+              • サブスクリプションは現在の期間終了の24時間前までに自動更新をオフにしない限り自動的に更新されます{'\n'}
+              • 更新料金は現在の期間終了前24時間以内にアカウントに請求されます{'\n'}
+              • {Platform.OS === 'ios'
+                  ? '設定アプリ > Apple ID > サブスクリプション'
+                  : 'Google Play ストア > お支払いと定期購入'}から管理・自動更新のオフができます{'\n\n'}
               <Text style={styles.termsLink} onPress={() => Linking.openURL('https://kana-digital.github.io/souzoku-folio/terms.html')}>
                 利用規約
               </Text>

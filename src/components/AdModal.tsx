@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { COLORS } from '../constants/colors';
-import { AD_CONFIG } from '../constants/plans';
+import { AD_CONFIG, PRICING } from '../constants/plans';
 import { isAdMobAvailable, showInterstitial, showRewardedInterstitial } from '../services/admob';
 
 type AdType = 'image' | 'video';
@@ -123,7 +123,7 @@ export function AdModal({ visible, adType, onClose, onRemoveAds }: Props) {
             )}
             {onRemoveAds && (
               <TouchableOpacity style={styles.removeAdsBtn} onPress={onRemoveAds}>
-                <Text style={styles.removeAdsText}>¥100/月で広告を非表示にする</Text>
+                <Text style={styles.removeAdsText}>¥{PRICING.monthly.price}/月で広告を非表示にする</Text>
               </TouchableOpacity>
             )}
           </View>
