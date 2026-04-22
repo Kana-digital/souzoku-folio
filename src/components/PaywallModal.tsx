@@ -17,7 +17,7 @@ import { PRICING } from '../constants/plans';
 interface PaywallModalProps {
   visible: boolean;
   onClose: () => void;
-  onPurchase: (period: 'monthly' | 'yearly') => Promise<boolean>;
+  onPurchase: (period: 'monthly' | 'yearly') => Promise<boolean | { success: boolean; errorDetail?: string }>;
   onRestore: () => Promise<boolean>;
 }
 
@@ -39,23 +39,26 @@ export const PaywallModal = ({
   const handlePurchase = async () => {
     setLoading(true);
     try {
-      const timeoutPromise = new Promise<boolean>((_, reject) =>
+      const timeoutPromise = new Promise<{ success: boolean; errorDetail?: string }>((_, reject) =>
         setTimeout(() => reject(new Error('timeout')), 30000)
       );
-      const success = await Promise.race([onPurchase(selected), timeoutPromise]);
+      const result = await Promise.race([onPurchase(selected), timeoutPromise]);
+      // 後方互換: boolean または { success, errorDetail } 両対応
+      const success = typeof result === 'boolean' ? result : result.success;
+      const errorDetail = typeof result === 'object' && result.errorDetail ? result.errorDetail : undefined;
       if (success) {
         onClose();
       } else {
         Alert.alert(
           '購入できませんでした',
-          '購入がキャンセルされたか、処理中にエラーが発生しました。もう一度お試しください。',
+          errorDetail || '購入がキャンセルされたか、処理中にエラーが発生しました。もう一度お試しください。',
         );
       }
     } catch (e: any) {
       if (e.message === 'timeout') {
         Alert.alert('タイムアウト', '購入処理に時間がかかっています。通信環境を確認してもう一度お試しください。');
       } else {
-        Alert.alert('エラー', '購入処理中にエラーが発生しました。もう一度お試しください。');
+        Alert.alert('エラー', `購入処理中にエラーが発生しました: ${e.message || e}`);
       }
     } finally {
       setLoading(false);

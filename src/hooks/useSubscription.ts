@@ -107,47 +107,46 @@ export function useSubscription() {
 
   // ── 購入処理（RevenueCat対応） ──
   const purchase = useCallback(
-    async (period: 'monthly' | 'yearly') => {
-      if (isRCAvailable()) {
-        try {
-          const offering = await getOfferings();
-          if (!offering) {
-            console.error('[Purchase] Offeringが取得できません');
-            return false;
-          }
-          // 3段階フォールバックでパッケージを検索
-          const identifier = period === 'monthly' ? '$rc_monthly' : '$rc_annual';
-          const packageType = period === 'monthly' ? 'MONTHLY' : 'ANNUAL';
-          const pkg =
-            offering.availablePackages.find((p: any) => p.identifier === identifier) ??
-            offering.availablePackages.find((p: any) => p.packageType === packageType) ??
-            offering.availablePackages[0];
-          if (!pkg) {
-            console.error('[Purchase] 利用可能なパッケージがありません');
-            return false;
-          }
-          console.log(`[Purchase] パッケージ選択: ${pkg.identifier} (type: ${pkg.packageType})`);
-          const success = await purchasePackage(pkg);
-          if (success) {
-            const rcStatus = await checkSubscription();
-            const newSub: SubscriptionState = {
-              planId: 'premium',
-              entitlementId: 'premium_access',
-              expiresAt: rcStatus.expiresAt,
-            };
-            setSub(newSub);
-            await AsyncStorage.setItem(SUB_KEY, JSON.stringify(newSub));
-          }
-          return success;
-        } catch (e) {
-          console.error('[Purchase] RevenueCat購入エラー:', e);
-          return false;
-        }
+    async (period: 'monthly' | 'yearly'): Promise<{ success: boolean; errorDetail?: string }> => {
+      if (!isRCAvailable()) {
+        console.warn('[Purchase] RevenueCat SDKが利用できないため購入できません');
+        return { success: false, errorDetail: 'RevenueCat SDKが初期化されていません。アプリを再起動してください。' };
       }
 
-      // SDK未導入時 → 購入不可（エラーとして返す）
-      console.warn('[Purchase] RevenueCat SDKが利用できないため購入できません');
-      return false;
+      try {
+        const offering = await getOfferings();
+        if (!offering) {
+          console.error('[Purchase] Offeringが取得できません');
+          return { success: false, errorDetail: 'サブスクリプション情報を取得できませんでした。通信環境を確認してください。' };
+        }
+        // 3段階フォールバックでパッケージを検索
+        const identifier = period === 'monthly' ? '$rc_monthly' : '$rc_annual';
+        const packageType = period === 'monthly' ? 'MONTHLY' : 'ANNUAL';
+        const pkg =
+          offering.availablePackages.find((p: any) => p.identifier === identifier) ??
+          offering.availablePackages.find((p: any) => p.packageType === packageType) ??
+          offering.availablePackages[0];
+        if (!pkg) {
+          console.error('[Purchase] 利用可能なパッケージがありません。availablePackages:', offering.availablePackages.length);
+          return { success: false, errorDetail: `パッケージが見つかりません（${period}）。App Store側の設定を確認してください。` };
+        }
+        console.log(`[Purchase] パッケージ選択: ${pkg.identifier} (type: ${pkg.packageType})`);
+        const success = await purchasePackage(pkg);
+        if (success) {
+          const rcStatus = await checkSubscription();
+          const newSub: SubscriptionState = {
+            planId: 'premium',
+            entitlementId: 'premium_access',
+            expiresAt: rcStatus.expiresAt,
+          };
+          setSub(newSub);
+          await AsyncStorage.setItem(SUB_KEY, JSON.stringify(newSub));
+        }
+        return { success, errorDetail: success ? undefined : '購入処理がキャンセルされたか、Apple側でエラーが発生しました。' };
+      } catch (e: any) {
+        console.error('[Purchase] RevenueCat購入エラー:', e);
+        return { success: false, errorDetail: `購入エラー: ${e.message || e}` };
+      }
     },
     [],
   );
