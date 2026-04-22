@@ -114,11 +114,13 @@ export function useSubscription() {
       }
 
       try {
+        console.log('[Purchase] getOfferings() 呼び出し...');
         const offering = await getOfferings();
         if (!offering) {
-          console.error('[Purchase] Offeringが取得できません');
-          return { success: false, errorDetail: 'サブスクリプション情報を取得できませんでした。通信環境を確認してください。' };
+          console.error('[Purchase] Offeringが取得できません（offerings.current = null）');
+          return { success: false, errorDetail: 'Offeringが取得できません。RevenueCatダッシュボードの設定を確認してください。(offerings.current=null)' };
         }
+        console.log(`[Purchase] Offering取得成功: ${offering.identifier}, パッケージ数: ${offering.availablePackages?.length}`);
         // 3段階フォールバックでパッケージを検索
         const identifier = period === 'monthly' ? '$rc_monthly' : '$rc_annual';
         const packageType = period === 'monthly' ? 'MONTHLY' : 'ANNUAL';

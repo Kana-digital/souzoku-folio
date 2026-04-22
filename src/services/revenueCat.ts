@@ -48,12 +48,26 @@ export async function initRevenueCat(): Promise<void> {
 
 /** 現在の Offering を取得 */
 export async function getOfferings() {
-  if (!isAvailable || !Purchases) return null;
+  if (!isAvailable || !Purchases) {
+    console.warn(`[RevenueCat] getOfferings スキップ: isAvailable=${isAvailable}, Purchases=${!!Purchases}`);
+    return null;
+  }
   try {
+    console.log('[RevenueCat] getOfferings 呼び出し開始...');
     const offerings = await Purchases.getOfferings();
+    console.log('[RevenueCat] offerings取得成功:', JSON.stringify({
+      currentExists: !!offerings.current,
+      currentIdentifier: offerings.current?.identifier,
+      allKeys: Object.keys(offerings.all || {}),
+      packagesCount: offerings.current?.availablePackages?.length ?? 0,
+    }));
+    if (!offerings.current) {
+      console.warn('[RevenueCat] offerings.current が null です。offerings.all:', JSON.stringify(offerings.all));
+    }
     return offerings.current;
-  } catch (e) {
-    console.error('[RevenueCat] Offerings取得エラー:', e);
+  } catch (e: any) {
+    console.error('[RevenueCat] Offerings取得エラー:', e?.message || e);
+    console.error('[RevenueCat] エラー詳細:', JSON.stringify(e));
     return null;
   }
 }
